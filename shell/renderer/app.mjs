@@ -206,9 +206,9 @@ function vrowEl(r, indent, top) {
   div.appendChild(cb);
 
   // 资源管理器式交互:单击行 = 勾选/取消(260ms 内二击 = 双击打开)
+  // 双击打开对全部行生效(浏览内容是只读操作,与清理资格无关);单击选择仅限可执行行
   div.onclick = e => {
     if (e.target.closest('.twistie') || e.target.type === 'checkbox') return;
-    if (!canAct) return;
     if (e.detail >= 2) {
       // 双击的第二次 click:撤销挂起的单击变化,打开
       if (pendingClick && pendingClick.path === r.path) {
@@ -220,6 +220,7 @@ function vrowEl(r, indent, top) {
       renderWindow(); refreshPlanPreview();
       return;
     }
+    if (!canAct) return; // 不可执行行:单击不勾选(双击仍可打开,见上)
     if (pendingClick && pendingClick.path !== r.path) {
       // 点击了不同行:先提交上一行的单击
       clearTimeout(pendingClick.timer);

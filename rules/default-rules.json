@@ -1,0 +1,234 @@
+{
+  "version": 2,
+  "description": "DiskJanitor 内置规则包 v2 —— 规则按数组顺序匹配,first-match-wins;未命中条目 fail-closed(高风险/不可替代/不勾选/需询问)",
+  "rules": [
+    {
+      "id": "pytest-garbage",
+      "description": "pytest 临时产物目录",
+      "match": { "path_glob": "**/temp/pytest-of-*/**" },
+      "risk_level": "low",
+      "reversibility": "regenerable",
+      "suggested_action": "recycle",
+      "default_checked": true,
+      "rationale": "pytest 每次运行重新生成,本机曾堆积 57.8GB",
+      "enabled": true
+    },
+    {
+      "id": "npm-cache",
+      "description": "npm 下载缓存",
+      "match": { "path_glob": "**/appdata/local/npm-cache/**" },
+      "risk_level": "low",
+      "reversibility": "regenerable",
+      "suggested_action": "recycle",
+      "default_checked": true,
+      "rationale": "npm cache clean --force 等价,自动重建",
+      "enabled": true
+    },
+    {
+      "id": "pip-cache",
+      "description": "pip 下载缓存",
+      "match": { "path_glob": "**/appdata/local/pip/cache/**" },
+      "risk_level": "low",
+      "reversibility": "regenerable",
+      "suggested_action": "recycle",
+      "default_checked": true,
+      "rationale": "pip cache purge 等价,自动重建",
+      "enabled": true
+    },
+    {
+      "id": "uv-cache",
+      "description": "uv 包缓存",
+      "match": { "path_glob": "**/appdata/local/uv/cache/**" },
+      "risk_level": "low",
+      "reversibility": "regenerable",
+      "suggested_action": "recycle",
+      "default_checked": true,
+      "rationale": "uv cache clean 等价",
+      "enabled": true
+    },
+    {
+      "id": "node-gyp-cache",
+      "description": "node-gyp 编译头缓存",
+      "match": { "path_glob": "**/appdata/local/node-gyp/**" },
+      "risk_level": "low",
+      "reversibility": "regenerable",
+      "suggested_action": "recycle",
+      "default_checked": true,
+      "rationale": "编译原生模块时按需重下",
+      "enabled": true
+    },
+    {
+      "id": "pycache",
+      "description": "Python 字节码缓存",
+      "match": { "name_glob": "__pycache__" },
+      "risk_level": "low",
+      "reversibility": "regenerable",
+      "suggested_action": "recycle",
+      "default_checked": true,
+      "rationale": "运行时自动重建",
+      "enabled": true
+    },
+    {
+      "id": "modelscope-cache",
+      "description": "modelscope 模型缓存",
+      "match": { "path_glob": "**/.cache/modelscope/**" },
+      "risk_level": "medium",
+      "reversibility": "regenerable",
+      "suggested_action": "stage",
+      "default_checked": false,
+      "rationale": "可重下但流量大,删除前确认",
+      "enabled": true
+    },
+    {
+      "id": "generic-dotcache",
+      "description": "通用 .cache 目录",
+      "match": { "name_glob": ".cache" },
+      "risk_level": "low",
+      "reversibility": "regenerable",
+      "suggested_action": "recycle",
+      "default_checked": true,
+      "rationale": "应用缓存惯例目录",
+      "enabled": true
+    },
+    {
+      "id": "pnpm-store",
+      "description": "pnpm 内容寻址存储",
+      "match": { "path_glob": "**/appdata/local/pnpm/store/**" },
+      "risk_level": "medium",
+      "reversibility": "regenerable",
+      "suggested_action": "stage",
+      "default_checked": false,
+      "rationale": "活跃项目可能引用;prune 判定 0 可回收时不删",
+      "enabled": true
+    },
+    {
+      "id": "node-modules",
+      "description": "node_modules 依赖目录",
+      "match": { "name_glob": "node_modules" },
+      "risk_level": "medium",
+      "reversibility": "regenerable",
+      "suggested_action": "stage",
+      "default_checked": false,
+      "rationale": "npm/pnpm install 可重建,但需网络与时间",
+      "enabled": true
+    },
+    {
+      "id": "playwright-browsers",
+      "description": "Playwright 浏览器二进制",
+      "match": { "name_glob": "ms-playwright" },
+      "risk_level": "medium",
+      "reversibility": "regenerable",
+      "suggested_action": "stage",
+      "default_checked": false,
+      "rationale": "跑自动化测试时重下数百 MB",
+      "enabled": true
+    },
+    {
+      "id": "nuget-packages",
+      "description": "NuGet 全局包缓存",
+      "match": { "path_glob": "**/.nuget/packages/**" },
+      "risk_level": "medium",
+      "reversibility": "regenerable",
+      "suggested_action": "stage",
+      "default_checked": false,
+      "rationale": "dotnet restore 可重建",
+      "enabled": true
+    },
+    {
+      "id": "lunatranslator-cache",
+      "description": "LunaTranslator OCR/翻译缓存",
+      "match": { "path_glob": "**/lunatranslator/cache/**" },
+      "risk_level": "low",
+      "reversibility": "regenerable",
+      "suggested_action": "recycle",
+      "default_checked": true,
+      "rationale": "OCR/翻译模型缓存,可自动重下(本机实测 562MB)",
+      "enabled": true
+    },
+    {
+      "id": "beitong-firmware",
+      "description": "beitong 设备固件包",
+      "match": { "path_glob": "**/beitong/update/**" },
+      "risk_level": "medium",
+      "reversibility": "regenerable",
+      "suggested_action": "stage",
+      "default_checked": false,
+      "rationale": "设备固件,升级完成后无用;删后需要时重新下载",
+      "enabled": true
+    },
+    {
+      "id": "vs-package-cache",
+      "description": "Visual Studio 安装包缓存",
+      "match": { "path_glob": "**/visual studio/packages/**" },
+      "risk_level": "high",
+      "reversibility": "recoverable",
+      "suggested_action": "skip",
+      "default_checked": false,
+      "rationale": "VS 修复/卸载要用;VS 已卸载才可清,清后需重新下载安装介质",
+      "enabled": true
+    },
+    {
+      "id": "electron-updater-pending",
+      "description": "应用更新器目录(含待装安装包)",
+      "match": { "path_glob": "**/appdata/local/*@*-desktop-updater*/**" },
+      "risk_level": "high",
+      "reversibility": "recoverable",
+      "suggested_action": "skip",
+      "default_checked": false,
+      "rationale": "可能含待安装更新包;本机经验:DSH 应用内更新必败需手动装,确认版本后再清",
+      "enabled": true
+    },
+    {
+      "id": "docker-vhdx",
+      "description": "Docker WSL 虚拟磁盘",
+      "match": { "path_glob": "**/docker/**/*.vhdx" },
+      "risk_level": "high",
+      "reversibility": "recoverable",
+      "suggested_action": "skip",
+      "default_checked": false,
+      "rationale": "vhdx 内是镜像与卷数据;不用 Docker 应走卸载流程",
+      "enabled": true
+    },
+    {
+      "id": "browser-profile",
+      "description": "浏览器用户数据(密码/扩展/历史)",
+      "match": { "path_glob": "**/appdata/local/*/user data/**" },
+      "risk_level": "high",
+      "reversibility": "irreplaceable",
+      "suggested_action": "skip",
+      "default_checked": false,
+      "rationale": "含登录态与个人数据;清缓存应在浏览器内操作",
+      "enabled": true
+    },
+    {
+      "id": "im-message-files",
+      "description": "聊天软件接收文件与消息数据",
+      "match": { "path_glob": "**/documents/tencent files/**" },
+      "risk_level": "high",
+      "reversibility": "irreplaceable",
+      "suggested_action": "skip",
+      "default_checked": false,
+      "rationale": "历史聊天与接收文件,不可替代",
+      "enabled": true
+    },
+    {
+      "id": "wechat-files",
+      "description": "微信文件目录",
+      "match": { "path_glob": "**/xwechat_files/**" },
+      "risk_level": "high",
+      "reversibility": "irreplaceable",
+      "suggested_action": "skip",
+      "default_checked": false,
+      "rationale": "聊天记录与备份,不可替代",
+      "enabled": true
+    }
+  ],
+  "protected_paths": [
+    "C:\\Windows",
+    "C:\\Program Files",
+    "C:\\Program Files (x86)",
+    "C:\\ProgramData\\Microsoft",
+    "C:\\$RECYCLE.BIN",
+    "C:\\System Volume Information"
+  ]
+}

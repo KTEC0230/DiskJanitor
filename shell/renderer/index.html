@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; script-src 'self'" />
+  <title>磁盘清道夫 DiskJanitor</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <div class="brand">磁盘清道夫 <span class="sub">分析只读 · 删除必可逆</span></div>
+    <div class="scanbar">
+      <input id="rootInput" type="text" placeholder="选择要分析的目录" spellcheck="false" />
+      <button id="pickBtn">浏览…</button>
+      <button id="scanBtn" class="primary">扫描</button>
+      <button id="pauseBtn" class="hidden">暂停</button>
+      <button id="stopBtn" class="hidden danger">停止</button>
+    </div>
+    <div class="scanmeta">
+      <div class="progress"><div id="progressFill" class="hidden"></div></div>
+      <span id="scanStatus"></span>
+    </div>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab active" data-tab="list">清理列表</button>
+    <button class="tab" data-tab="undo">撤销面板</button>
+    <button class="tab" data-tab="overlay">规则覆盖(TOML)</button>
+  </nav>
+
+  <main id="tab-list" class="tab-body active">
+    <div class="toolbar" id="catBar"></div>
+    <div class="toolbar">
+      <button id="viewTree" class="viewbtn active">树视图</button>
+      <button id="viewClean" class="viewbtn">建议清理</button>
+      <span class="sep"></span>
+      <button id="selectAllBtn">全选可清理项</button>
+      <button id="clearSelBtn">清空选择</button>
+      <span class="sep"></span>
+      <button id="exportBtn">导出报告(供 AI 分析)</button>
+      <span class="hint">单击选择 · 双击打开(资源管理器)</span>
+    </div>
+    <div class="list-viewport" id="listViewport">
+      <div id="listSpacer"><div id="listRoot"></div></div>
+    </div>
+  </main>
+
+  <main id="tab-undo" class="tab-body">
+    <div class="panel-head">
+      <span>撤销记录保存在 %APPDATA%\DiskJanitor\undo\,应用重启后仍可撤销。</span>
+      <button id="undoRefresh">刷新</button>
+    </div>
+    <div class="list" id="undoRoot"></div>
+  </main>
+
+  <main id="tab-overlay" class="tab-body">
+    <p class="hint">
+      内置规则只读。此处 overlay 只能<strong>收紧</strong>:停用规则(disable)、收紧已有规则([[override]])、追加保守规则([[rule]])。
+      任何放宽参数都会被拒绝。
+    </p>
+    <textarea id="overlayText" spellcheck="false"></textarea>
+    <div class="panel-head">
+      <button id="overlaySave" class="primary">校验并保存</button>
+      <span id="overlayStatus"></span>
+    </div>
+  </main>
+
+  <footer>
+    <div id="planSummary">尚未选择</div>
+    <button id="execBtn" class="primary" disabled>执行清理</button>
+  </footer>
+
+  <div id="modal" class="modal hidden">
+    <div class="modal-card">
+      <div id="modalBody"></div>
+      <div class="modal-actions" id="modalActions"></div>
+    </div>
+  </div>
+
+  <script type="module" src="app.mjs"></script>
+</body>
+</html>

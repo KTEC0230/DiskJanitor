@@ -1,0 +1,45 @@
+{
+  "name": "disk-janitor",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "分析只读、删除必可逆的磁盘清理桌面应用",
+  "scripts": {
+    "dry-run": "node tools/dry-run.mjs",
+    "build:core": "node shell/build-core.mjs",
+    "start": "node shell/build-core.mjs && electron shell/main.mjs"
+  },
+  "dependencies": {
+    "trash": "^10.1.1"
+  },
+  "devDependencies": {
+    "electron": "^45.2.3",
+    "electron-builder": "^26.18.0",
+    "esbuild": "^0.28.2"
+  },
+  "main": "shell/main.mjs",
+  "author": "KTEC",
+  "build": {
+    "appId": "com.ktec.diskjanitor",
+    "productName": "DiskJanitor",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "package.json",
+      "shell/main.mjs",
+      "shell/core.mjs",
+      "shell/preload.cjs",
+      "shell/renderer/**",
+      "rules/**"
+    ],
+    "asarUnpack": [
+      "node_modules/**"
+    ],
+    "win": {
+      "icon": "build/icon.ico",
+      "target": "dir"
+    }
+  }
+}

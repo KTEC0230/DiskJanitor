@@ -1,5 +1,9 @@
 # DiskJanitor 交接文档
 
+> **仓库**:https://github.com/KTEC0230/DiskJanitor.git(KTEC0230;本机凭据为 KTEC0230,KTEC1200 已封)
+> **项目路径**:C:Users¸25DesktopgithubDiskJanitor(2026-11-13 从 D:Kzcode 迁入;跨盘移动后必须 pnpm install 重连链接)
+> **发布**:tools/publish-release.sh(建 release+传 asset,走 xeno 代理 127.0.0.1:6234;git 推送需 -c http.proxy=该地址)
+
 > 本文件是项目唯一状态文档。**每次任务结束必须更新本文件**(用户明示要求)。
 > 接手先读「当前状态」与「硬约束」,改完必须回写本文件。
 

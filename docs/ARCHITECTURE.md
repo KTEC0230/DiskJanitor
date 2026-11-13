@@ -135,7 +135,7 @@ assertDeletable(path, userProtected, execLayer?): void  // throws BlockedPathErr
 
 ## 7. 验证记录
 
-**M1 dry-run(2026-11-08)**:`C:\Users\27025\AppData\Local` 17.1s / 248,374 文件 / 26.48GB,四类输出正确;发现并修复 `C:\Users` 前缀误拦、评估深度与规则粒度错位两个设计 bug。
+**M1 dry-run(2026-11-08)**:`C:\Users\<用户名>\AppData\Local` 17.1s / 248,374 文件 / 26.48GB,四类输出正确;发现并修复 `C:\Users` 前缀误拦、评估深度与规则粒度错位两个设计 bug。
 
 **M2 selftest(2026-11-09):23 PASS / 0 FAIL**,覆盖:
 - stage→undo 往返(嵌套目录、CJK 文件、**跨重启重建 manager 仍可撤销**、空批次清理)

@@ -149,8 +149,8 @@ function registerIpc() {
         maxDepth,
         concurrency: 32,
         controller: scanController,
-        onProgress: (bytes, p) => {
-          if (win && !win.isDestroyed()) win.webContents.send('dj:scan-progress', { bytes, path: p, root });
+        onProgress: (bytes, p, files) => {
+          if (win && !win.isDestroyed()) win.webContents.send('dj:scan-progress', { bytes, path: p, files, root });
         },
       });
       rowMap = new Map();
@@ -291,6 +291,8 @@ function registerIpc() {
       id: r.id, planId: r.planId, mode: r.mode, status: r.status, createdAt: r.createdAt,
       movable: r.entries.filter(e => e.status === 'moved').length,
       movableBytes: r.entries.filter(e => e.status === 'moved').reduce((s, e) => s + e.sizeBytes, 0),
+      // 明细(撤销面板展开用):原路径/大小/状态
+      entries: r.entries.map(e => ({ originalPath: e.originalPath, sizeBytes: e.sizeBytes, status: e.status })),
     }));
   });
 

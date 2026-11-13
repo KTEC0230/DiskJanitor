@@ -89,9 +89,19 @@ async function doScan(root) {
   }
 }
 
-window.dj.onScanProgress(({ bytes, path }) => {
+// 进度采样:差分算实时速率(总量未知,百分比无意义;速率+计数最诚实)
+let lastSample = { bytes: 0, files: 0, time: Date.now(), rate: 0, rateFiles: 0 };
+window.dj.onScanProgress(({ bytes, path, files }) => {
   if (!state.scanning) return;
-  setStatus(`扫描中… ${fmt(bytes)} — ${path}`);
+  const now = Date.now();
+  const dt = (now - lastSample.time) / 1000;
+  if (dt >= 0.8) {
+    const rate = (bytes - lastSample.bytes) / dt;
+    const rateFiles = Math.round((files - lastSample.files) / dt);
+    lastSample = { bytes, files, time: now, rate, rateFiles };
+  }
+  const rateText = lastSample.rate > 0 ? ` · ${fmt(lastSample.rate)}/s · ${lastSample.rateFiles} 文件/s` : '';
+  setStatus(`扫描中… ${fmt(bytes)} · ${files} 文件${rateText} — ${path}`);
 });
 
 function setStatus(text) { $('scanStatus').textContent = text; }
@@ -444,14 +454,36 @@ async function renderUndo() {
         hint.textContent = '文件在系统回收站内,清空回收站即最终删除';
         div.appendChild(hint);
       }
-    }
+      const d = document.createElement('button');
+      d.textContent = '明细';
+      d.title = '展开本批次的条目清单(原路径/大小/状态)';
+      d.onclick = () => toggleUndoDetail(r.id, d);
+      div.appendChild(d);
       root.appendChild(div);
+      const holder = document.createElement('div');
+      holder.id = `udetail-${r.id}`;
+      holder.className = 'udetail hidden';
+      const movedEntries = (r.entries ?? []).filter(e => e.status === 'moved' || e.status === 'purged');
+      if (movedEntries.length > 0) {
+        holder.innerHTML = movedEntries.map(e =>
+          `<div class="udrow"><span class="size">${fmt(e.sizeBytes)}</span><span class="path mono">${e.originalPath}</span><span class="rule">${e.status}</span></div>`
+        ).join('');
+      }
+      root.appendChild(holder);
+    }
     }
     console.log('[dj] renderUndo done');
   } catch (err) {
     root.innerHTML = `<div class="row"><span class="path err-text">撤销面板加载失败: ${String(err?.message ?? err).replaceAll('<', '&lt;')}</span></div>`;
     console.error('[dj] renderUndo failed:', err);
   }
+}
+
+function toggleUndoDetail(id, btn) {
+  const holder = $(`udetail-${id}`);
+  if (!holder) return;
+  const hidden = holder.classList.toggle('hidden');
+  btn.textContent = hidden ? '明细' : '收起';
 }
 
 async function purgeOne(id, items, bytes) {
@@ -510,6 +542,42 @@ async function saveOverlay() {
   const res = await window.dj.overlaySave($('overlayText').value);
   setOverlayStatus(res.valid, res.errors, res.applied, await (await window.dj.overlayLoad()).path);
   if (res.valid) setStatus('overlay 已生效,重新扫描即应用');
+}
+
+// overlay 模板:含全部三类合法操作的注释示例,粘贴改路径即可用
+const OVERLAY_TEMPLATE = `# ============ DiskJanitor 规则覆盖模板 ============
+# 本文件只能"收紧"内置规则;任何放宽参数都会被校验拒绝。
+# 三种合法操作:停用规则(disable)、收紧已有规则([[override]])、追加保守规则([[rule]])。
+
+# --- 1. 停用不需要的内置规则(写规则 id)---
+# disable = ["pip-cache", "generic-dotcache"]
+
+# --- 2. 收紧已有规则(只能:勾选→不勾选、动作→stage/skip、风险→上调)---
+# [[override]]
+# id = "node-modules"
+# default_checked = false
+# suggested_action = "stage"
+
+# --- 3. 追加你自己的缓存规则(必须保守:不默认勾选、动作 stage/skip、风险 medium/high)---
+# [[rule]]
+# id = "my-app-cache"
+# description = "某某软件的下载缓存"
+# match = { path_glob = "**/某软件/cache/**" }
+# risk_level = "medium"
+# reversibility = "regenerable"
+# suggested_action = "stage"
+# default_checked = false
+# rationale = "删后自动重建,只影响下次联网加载"
+# enabled = true
+
+# --- 4. 追加保护路径(仅增不减;执行层硬拦截)---
+# protected_paths = ["D:\\\\某个重要目录"]
+`;
+
+function insertOverlayTemplate() {
+  const ta = $('overlayText');
+  ta.value = (ta.value.trimEnd() ? ta.value.trimEnd() + '\n\n' : '') + OVERLAY_TEMPLATE;
+  ta.scrollTop = ta.scrollHeight;
 }
 
 // ---------- 视图切换 / 全选 / 导出报告 ----------
@@ -580,6 +648,7 @@ $('stopBtn').onclick = async () => {
 $('execBtn').onclick = onExecute;
 $('undoRefresh').onclick = renderUndo;
 $('overlaySave').onclick = saveOverlay;
+$('overlayTemplate').onclick = insertOverlayTemplate;
 $('listViewport').addEventListener('scroll', renderWindow, { passive: true });
 window.addEventListener('resize', renderWindow);
 

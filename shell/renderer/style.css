@@ -81,3 +81,7 @@ footer { border-top: 1px solid var(--line); padding: 10px 14px; display: flex; a
 .ok-text { color: var(--ok); }
 .err-text { color: var(--err); }
 .mono { font-family: Consolas, monospace; font-size: 12px; }
+
+.udetail { background: var(--panel2); border-radius: 6px; margin: 2px 10px 6px 26px; padding: 4px 10px; max-height: 220px; overflow: auto; }
+.udrow { display: flex; gap: 10px; font-size: 11px; padding: 2px 0; border-bottom: 1px dashed color-mix(in srgb, var(--line) 60%, transparent); align-items: center; }
+.udrow .path { flex: 1; min-width: 100px; }

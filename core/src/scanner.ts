@@ -25,8 +25,8 @@ export interface ScanOptions {
   /** 快照收录的最大相对深度(目录大小始终整树累计,depth 只影响收录) */
   maxDepth?: number; // 默认 64
   concurrency?: number; // 默认 32
-  /** 进度回调(已扫描字节数、当前路径) */
-  onProgress?: (scannedBytes: number, currentPath: string) => void;
+  /** 进度回调(已扫描字节、当前路径、已扫文件数;总量未知,百分比由渲染层自定) */
+  onProgress?: (scannedBytes: number, currentPath: string, scannedFiles: number) => void;
   /** 暂停/停止控制(可选) */
   controller?: ScanController;
 }
@@ -119,7 +119,7 @@ export async function scan(root: string, opts: ScanOptions = {}): Promise<Snapsh
         } catch (err) {
           void err; // 无权限/正在消失:静默跳过,快照如实缺失
         }
-        opts.onProgress?.(totalBytes, child);
+        opts.onProgress?.(totalBytes, child, totalFiles);
       }
     };
     await Promise.all(Array.from({ length: Math.min(concurrency, Math.max(1, names.length)) }, worker));
